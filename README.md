@@ -47,3 +47,6 @@ The touchscreen display would have at all times (refreshing every second or so) 
 stretch goal
 - If I can get train timetables, the time for next two trains from CJ to Portsmouth and Alton.
 https://www.nationalrail.co.uk/developers/darwin-data-feeds/
+
+Train timetable time - think I will need Kiota after all
+https://realtime.nationalrail.co.uk/LDBWS/docs/documentation.html

@@ -1,11 +1,21 @@
 import pandas as pd
 import asyncio
+import json
+import os
 from datetime import datetime
 from project_data_gathering import constant_data_pull
+from queries_to_bikepoint_api_async import get_all_boris_bike_info, get_specific_boris_bike_info
+from queries_to_line_api_async import _get_list_modes, _get_tube_lines, _all_valid_routes_all_lines, _all_valid_routes_single_line, _get_tube_status_update, _get_stops_on_a_line, _next_train_or_bus
+import httpx
 from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Button, Static, Label
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
+
+client = httpx.AsyncClient(
+    headers={"Accept": "application/json"},
+    base_url="https://api.tfl.gov.uk/",
+)
 
 # Textual app to display the three items from data_dict
 class TfLDisplayApp(App):
@@ -13,7 +23,7 @@ class TfLDisplayApp(App):
     - header: current time and exit button
     - left: DataTable for `next_tube_and_bus_df`
     - top-right: DataTable from `tube_line_status`
-    - bottom-right: DataTable for `borris_bike_df`
+    - bottom-right: DataTable for `boris_bike_df`
     
     Data refreshes every 5 seconds.
     """
@@ -27,6 +37,9 @@ class TfLDisplayApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.data_dict = {}
+        self.client = client
+        self.dict_of_useful_tube_and_bus_stops = {}
+        self.dict_of_useful_bikepoints = {}
 
     def _df_to_datatable(self, df) -> DataTable:
         """Convert a pandas DataFrame to a Textual DataTable widget.
@@ -51,15 +64,23 @@ class TfLDisplayApp(App):
         """Refresh data every 5 seconds and update display."""
         while True:
             try:
-                # Fetch fresh data
-                self.data_dict = await constant_data_pull()
-                
-                # Update time
-                self.current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                
+                # Fetch fresh data - line status
+                self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)               
                 # Update DataTables
                 await self._update_tables()
-                
+            
+                # Fetch fresh data - next tube or bus
+                self.data_dict['next_tube_and_bus_df'] = await _next_train_or_bus(self.client, self.dict_of_useful_tube_and_bus_stops)
+                # Update time
+                self.current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # Update DataTables
+                await self._update_tables()                
+            
+                # Fetch fresh data - boris bike
+                self.data_dict['boris_bike_df'] = await get_specific_boris_bike_info(self.client, self.dict_of_useful_bikepoints)
+                # Update DataTables
+                await self._update_tables()
+
             except Exception as e:
                 self.notify(f"Error refreshing data: {e}", severity="error")
             
@@ -80,8 +101,8 @@ class TfLDisplayApp(App):
             await self._refresh_datatable(top_table, top_df)
             
             # Update bottom-right table
-            bottom_table = self.query_one("#borris_bike_df", DataTable)
-            bottom_df = self.data_dict.get("borris_bike_df", pd.DataFrame())
+            bottom_table = self.query_one("#boris_bike_df", DataTable)
+            bottom_df = self.data_dict.get("boris_bike_df", pd.DataFrame())
             await self._refresh_datatable(bottom_table, bottom_df)
             
         except Exception as e:
@@ -112,8 +133,8 @@ class TfLDisplayApp(App):
         top_table = self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
         top_table.id = "status_df"
         
-        bottom_table = self._df_to_datatable(self.data_dict.get("borris_bike_df", pd.DataFrame()))
-        bottom_table.id = "borris_bike_df"
+        bottom_table = self._df_to_datatable(self.data_dict.get("boris_bike_df", pd.DataFrame()))
+        bottom_table.id = "boris_bike_df"
         
         # Header with time and exit button
         yield Vertical(
@@ -168,5 +189,9 @@ if __name__ == "__main__":
 
     app = TfLDisplayApp()
     app.data_dict = initial_data
+    app.client = client
+    app.dict_of_useful_tube_and_bus_stops = json.loads(os.getenv("dict_of_useful_tube_and_bus_stops"))
+    app.dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
+
     # run the TUI
     app.run()

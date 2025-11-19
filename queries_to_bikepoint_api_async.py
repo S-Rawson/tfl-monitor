@@ -1,5 +1,6 @@
 # created on 30/10/25 by gooseberry-py on a raspberry pi 5
 import asyncio
+import ast
 import os
 import httpx
 import rich
@@ -11,30 +12,31 @@ import json
 # load environment variables from .env file
 load_dotenv(dotenv_path="config.env")
 
+client = httpx.AsyncClient(
+    headers={"Accept": "application/json"},
+    base_url="https://api.tfl.gov.uk/",
+)
 
-async def get_all_boris_bike_info():
+async def get_all_boris_bike_info(client):
     #this works even without an API key
     #Gets all bike point locations. The Place object has an addtionalProperties array which contains the nbBikes, nbDocks and nbSpaces numbers which give the status of the BikePoint. A mismatch in these numbers i.e. nbDocks - (nbBikes + nbSpaces) != 0 indicates broken docks.
     #https://api-portal.tfl.gov.uk/api-details#api=BikePoint&operation=BikePoint_GetAll
-    bb_info = requests.get(f"https://api.tfl.gov.uk/BikePoint/")
+    bb_info = await client.get(f"BikePoint")
+    # bb_info = requests.get(f"https://api.tfl.gov.uk/BikePoint/")
     bikepoint_json = json.loads(bb_info.text)
     list_of_bikepoint_dict = {}
     for x in range(len(bikepoint_json)):
         list_of_bikepoint_dict[bikepoint_json[x]["id"]] = bikepoint_json[x]["commonName"] 
-    #finding a specific bikepoint based on a string
-    # for key, body in list_of_bikepoint_dict.items():
-    #     if "Caldwell" in body:
-    #         print(key, body)
     return list_of_bikepoint_dict
 
 
-async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
+async def get_specific_boris_bike_info(client, dict_of_useful_bikepoints):
     #Gets the bike point with the given id.
     #https://api-portal.tfl.gov.uk/api-details#api=BikePoint&operation=BikePoint_Get
     bike_info_df = pd.DataFrame(columns=["commonName", "NbBikes", "NbEmpty", ])
     
     for id in dict_of_useful_bikepoints.keys():
-        bikepoint_info_raw = requests.get(f"https://api.tfl.gov.uk/BikePoint/{id}")
+        bikepoint_info_raw = await client.get(f"BikePoint/{id}")
         bikepoint_info = json.loads(bikepoint_info_raw.text)
         #info from the bikepoint
         new_row = {}
@@ -56,12 +58,8 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
     return bike_info_df
 
 if __name__ == "__main__":
-    dict_of_useful_bikepoints = {
-    "BikePoints_355":"Clapham Common Station, Clapham Common",
-    "BikePoints_808":"Gauden Road, Clapham",
-    "BikePoints_55":"Finsbury Circus, Liverpool Street",
-    }
-    
-    bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints))
-    test = asyncio.run(get_all_boris_bike_info())
+
+    dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
+    bike_info = asyncio.run(get_specific_boris_bike_info(client, dict_of_useful_bikepoints))
+    test = asyncio.run(get_all_boris_bike_info(client))
     rich.print(bike_info)
