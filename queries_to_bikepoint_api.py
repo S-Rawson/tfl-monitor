@@ -51,7 +51,7 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
             #     new_row["NbStandardBikes"] = bikepoint_info["additionalProperties"][x]["value"]
             # if bikepoint_info["additionalProperties"][x]["key"] == "NbEBikes":
             #     new_row["NbEBikes"] = bikepoint_info["additionalProperties"][x]["value"]       
-        bike_info_df.loc[len(bike_info_df)] = new_row # Detian comment: df.loc accesses the index of the DataFrame first right? here the index refers to the length of the data frame, are you sure it's the right indexing? wouldn't it need like len()-1?
+        bike_info_df.loc[len(bike_info_df)] = new_row # Detian comment: df.loc accesses the index of the DataFrame first right? here the index refers to the length of the data frame, are you sure it's the right indexing? wouldn't it need like len()-1? This is because I don't see any re-naming of the indexes to sequences of integers that start with 1
     
     return bike_info_df
 
@@ -62,6 +62,6 @@ if __name__ == "__main__":
     "BikePoints_55":"Finsbury Circus, Liverpool Street",
     }
     
-    bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints))
+    bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints, unless ))
     test = asyncio.run(get_all_boris_bike_info())
     rich.print(bike_info)
