@@ -27,6 +27,7 @@ async def _get_list_modes():
     all_modes = requests.get(f'https://api.tfl.gov.uk/Line/Meta/Modes')
     all_modes_clean = json.loads(all_modes.text)
     all_modes_list = []
+    # Detian comment: consider comprehension for the next 2 rows, more efficient: all_modes_list = [all_modes_clean[item]["modeName"] for item in range(len(all_modes_clean))]
     for item in range(len(all_modes_clean)):
         all_modes_list.append(all_modes_clean[item]["modeName"])
     return all_modes_list
@@ -37,6 +38,7 @@ async def _get_tube_lines(modes):
     tube_lines = requests.get(f'https://api.tfl.gov.uk/Line/Mode/{modes}/Status')
     tube_lines_clean = json.loads(tube_lines.text)
     tube_lines_list = []
+    # Detian comment: consider comprehension for the next 2 rows for efficiency: tube_lines_list = [tube_lines_clean[item]["name"] for item in range(len(tube_lines_clean))]
     for item in range(len(tube_lines_clean)):
         tube_lines_list.append(tube_lines_clean[item]["name"])
     return tube_lines_list
