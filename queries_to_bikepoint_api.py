@@ -33,7 +33,7 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
     #https://api-portal.tfl.gov.uk/api-details#api=BikePoint&operation=BikePoint_Get
     bike_info_df = pd.DataFrame(columns=["commonName", "NbBikes", "NbEmpty", ])
     
-    for id in dict_of_useful_bikepoints.keys():
+    for id in dict_of_useful_bikepoints.keys(): # Detian comment: don't think you need .keys() here at the end of the dictionary - it you just leave it as dict_of_useful_bikepoints it would do the same thing. It's likely more efficient and can save some processing power
         bikepoint_info_raw = requests.get(f"https://api.tfl.gov.uk/BikePoint/{id}")
         bikepoint_info = json.loads(bikepoint_info_raw.text)
         #info from the bikepoint
@@ -51,7 +51,7 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
             #     new_row["NbStandardBikes"] = bikepoint_info["additionalProperties"][x]["value"]
             # if bikepoint_info["additionalProperties"][x]["key"] == "NbEBikes":
             #     new_row["NbEBikes"] = bikepoint_info["additionalProperties"][x]["value"]       
-        bike_info_df.loc[len(bike_info_df)] = new_row
+        bike_info_df.loc[len(bike_info_df)] = new_row # Detian comment: df.loc accesses the index of the DataFrame first right? here the index refers to the length of the data frame, are you sure it's the right indexing? wouldn't it need like len()-1?
     
     return bike_info_df
 
