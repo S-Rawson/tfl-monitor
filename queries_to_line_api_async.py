@@ -9,6 +9,8 @@ import requests
 from datetime import datetime as dt
 from dotenv import load_dotenv
 
+# Detian comment: again consider adding the typing to output and inputs for each function, like commented in queries_to_line_api.py
+
 # load environment variables from .env file
 load_dotenv(dotenv_path="config.env")
 
@@ -90,6 +92,7 @@ async def _get_tube_status_update(client):
         tube_line_status = pd.DataFrame.from_dict(status_dict, orient='index', columns=['Status'])
         tube_line_status.reset_index(inplace=True)
         tube_line_status.rename(columns={'index':'Line'}, inplace=True)
+        # Detian comment: same comments here as the comment for rows 79-85 of query_to_line_api.py, considering using list/record dictionary orientation
 
     return tube_line_status
 
@@ -118,7 +121,7 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
             new_row['expectedArrival'] = next_transport_dict[y][z]["expectedArrival"]
             if next_transport_dict[y][z]["currentLocation"]:
                 new_row['currentLocation'] = next_transport_dict[y][z]["currentLocation"]
-            eta_dashboard_df.loc[len(eta_dashboard_df)] = new_row#platformName will also be lineName
+            eta_dashboard_df.loc[len(eta_dashboard_df)] = new_row#platformName will also be lineName # Detian comment : check indexing of the df.loc
     
     #now converting the arrival time into a datetime format
     current_dateTime = dt.now()
