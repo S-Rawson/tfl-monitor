@@ -53,7 +53,7 @@ async def get_specific_boris_bike_info(client, dict_of_useful_bikepoints):
             #     new_row["NbStandardBikes"] = bikepoint_info["additionalProperties"][x]["value"]
             # if bikepoint_info["additionalProperties"][x]["key"] == "NbEBikes":
             #     new_row["NbEBikes"] = bikepoint_info["additionalProperties"][x]["value"]       
-        bike_info_df.loc[len(bike_info_df)] = new_row
+        bike_info_df.loc[len(bike_info_df)] = new_row # Detian comment: same comment as the queries to api (not async) file on df.loc indexing last value.
     
     return bike_info_df
 
