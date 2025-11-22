@@ -8,6 +8,8 @@ import rich
 import requests
 from datetime import datetime as dt
 
+# Detian comment: whenever possible, for each function, specify the output type, or even the inputs' types - this helps with understanding what kid of data each function takes or produces
+# for example format_timedelta(td: timedelta) -> str: . You would also need to import timedelta library for this
 
 def format_timedelta(td):
     # Convert to total seconds and round
@@ -83,8 +85,9 @@ async def _get_tube_status_update():
     tube_line_status = pd.DataFrame.from_dict(status_dict, orient='index', columns=['Status'])
     tube_line_status.reset_index(inplace=True)
     tube_line_status.rename(columns={'index':'Line'}, inplace=True)
-
-    return tube_line_status
+    # Detian comment : this is rather inefficient as you're transforming a index oriented dictionary and re-indexing and renaming them, consider getting the dictionary not in an index but record orientation, for example
+    # tube_line_status = pd.DataFrame({"Line": [status_neat[x]["name"] for x in range(len(status_neat))], "Status": [status_neat[x]["lineStatuses"][0]["statusSeverityDescription"] for x in range(len(status_neat))]})
+    # this allows you to simplify rows 79-85 into one single row, by considering the DataFrame orientation as list-like/record instead of indexing.    return tube_line_status
 
 async def _next_train_or_bus(dict_of_useful_tube_and_bus_stops):
     #Get the list of arrival predictions for given line ids based at the given stop
@@ -97,7 +100,7 @@ async def _next_train_or_bus(dict_of_useful_tube_and_bus_stops):
         schedule_neat = json.loads(schedule_raw.text)
         station_and_direction = f'{schedule_neat[0]["stationName"]} {schedule_neat[0]["platformName"]}'
         next_transport_dict[(line, station_and_direction)] = schedule_neat
-    for y in next_transport_dict.keys():
+    for y in next_transport_dict.keys(): # Detian comment: again, don't need .keys() here to do what you need to here, for efficiency
         for z in range(len(next_transport_dict[y])):
             new_row = {}
             new_row['modeName'] = next_transport_dict[y][z]["modeName"]
@@ -110,7 +113,7 @@ async def _next_train_or_bus(dict_of_useful_tube_and_bus_stops):
             new_row['expectedArrival'] = next_transport_dict[y][z]["expectedArrival"]
             if next_transport_dict[y][z]["currentLocation"]:
                 new_row['currentLocation'] = next_transport_dict[y][z]["currentLocation"]
-            eta_dashboard_df.loc[len(eta_dashboard_df)] = new_row#platformName will also be lineName
+            eta_dashboard_df.loc[len(eta_dashboard_df)] = new_row#platformName will also be lineName # Detian comment: again, check the indexing of the df.loc, as this indexing refers to the length of the df, which may not exist given Python's 0 to n-1 indexing
     
     #now converting the arrival time into a datetime format
     current_dateTime = dt.now()
