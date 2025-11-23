@@ -86,6 +86,9 @@ class TfLDisplayApp(App):
                 #self.notify(f"Error refreshing data: {e}", severity="error")
             
             # Wait 5 seconds before next refresh
+            # Detian comment: for this row here, can you add the "finally" clause, and make it part of the try: and except: block? I think your VS code error comes from not having the "finally" condition, that's why you're gettimg that error message on the readme.md, i.e. replace row 91 with
+            #finally:
+            #    await asyncio.sleep(5)     
             await asyncio.sleep(5)
 
     async def _update_tables(self) -> None:
