@@ -82,7 +82,8 @@ class TfLDisplayApp(App):
                 await self._update_tables()
 
             except Exception as e:
-                self.notify(f"Error refreshing data: {e}", severity="error")
+                print(f"Error refreshing data: {e}", severity="error")
+                #self.notify(f"Error refreshing data: {e}", severity="error")
             
             # Wait 5 seconds before next refresh
             await asyncio.sleep(5)
