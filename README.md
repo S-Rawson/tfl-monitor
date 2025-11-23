@@ -50,3 +50,20 @@ https://www.nationalrail.co.uk/developers/darwin-data-feeds/
 
 Train timetable time - think I will need Kiota after all
 https://realtime.nationalrail.co.uk/LDBWS/docs/documentation.html
+
+
+# Trying to run the code directly in the terminal 
+cant take a screenshot (scrot) as it is just providing a black screen (problem for tomorrow).
+ran the following in my terminal 
+
+alexander@raspberrypi:~ $ source "/home/alexander/Documents/Coding Projects/tfl-monitor/.venv/bin/activate"
+(.venv) alexander@raspberrypi:~ $ python '/home/alexander/Documents/Coding Projects/tfl-monitor/display_code.py'
+  File "/home/alexander/Documents/Coding Projects/tfl-monitor/display_code.py", line 88
+    await asyncio.sleep(5)
+    ^^^^^
+SyntaxError: expected 'except' or 'finally' block
+
+Any clues on the syntax errror? In VS Code it seems to work.
+
+
+
