@@ -3,6 +3,13 @@ To build an interface with TFL to display bus and tube times
 
 
 
+
+## how to use
+go to file display_code.py and run
+you will need 
+
+
+
 #todo
     get sid to apply ruff
     line legnth 100 etc
@@ -56,14 +63,13 @@ https://realtime.nationalrail.co.uk/LDBWS/docs/documentation.html
 cant take a screenshot (scrot) as it is just providing a black screen (problem for tomorrow).
 ran the following in my terminal 
 
-alexander@raspberrypi:~ $ source "/home/alexander/Documents/Coding Projects/tfl-monitor/.venv/bin/activate"
-(.venv) alexander@raspberrypi:~ $ python '/home/alexander/Documents/Coding Projects/tfl-monitor/display_code.py'
-  File "/home/alexander/Documents/Coding Projects/tfl-monitor/display_code.py", line 88
-    await asyncio.sleep(5)
-    ^^^^^
-SyntaxError: expected 'except' or 'finally' block
+alexander@raspberrypi:~ $ source "/home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/activate" -- for this I am getting "permission denied"? any ideas?
 
-Any clues on the syntax errror? In VS Code it seems to work.
+
+(.venv) alexander@raspberrypi:~ $ python '/home/alexander/Documents/Coding_Projects/tfl-monitor/display_code.py'
+
+
+
 
 
 

@@ -79,7 +79,7 @@ class TfLDisplayApp(App):
             
             finally:
                 # Wait 5 seconds before next refresh - always runs
-                await asyncio.sleep(5)
+                await asyncio.sleep(10)
 
     async def _fetch_and_update_tube_status(self) -> None:
         """Fetch tube line status independently."""
