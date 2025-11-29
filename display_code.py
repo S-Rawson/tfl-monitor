@@ -41,6 +41,15 @@ class TfLDisplayApp(App):
         self.dict_of_useful_tube_and_bus_stops = {}
         self.dict_of_useful_bikepoints = {}
 
+    def _get_colored_status(self, status: str) -> str:
+        """Return status with color markup based on content."""
+        if "good service" in status.lower():
+            return f"[green]{status}[/green]"
+        elif "minor delays" in status.lower():
+            return f"[orange]{status}[/orange]"
+        else:
+            return f"[red]{status}[/red]"
+
     def _df_to_datatable(self, df) -> DataTable:
         """Convert a pandas DataFrame to a Textual DataTable widget.
 
@@ -129,7 +138,13 @@ class TfLDisplayApp(App):
             
             # Add rows
             for _, row in df.iterrows():
-                table.add_row(*[str(x) for x in row.tolist()])
+                row_data = []
+                for col_name, value in zip(df.columns, row.tolist()):
+                    if col_name == "Status":
+                        row_data.append(self._get_colored_status(str(value)))
+                    else:
+                        row_data.append(str(value))
+                table.add_row(*row_data)
         except Exception:
             pass  # Skip if data invalid
 

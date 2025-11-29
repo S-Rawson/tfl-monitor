@@ -41,13 +41,13 @@ Screen {
 }
 
 #next_tube_and_bus_df {
-    width: 2fr;
+    width: 5fr;
     height: 100%;
     border: solid green;
 }
 
 #right_container {
-    width: 1fr;
+    width: 3fr;
     height: 100%;
     layout: vertical;
     border: solid blue;
