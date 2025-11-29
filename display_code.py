@@ -61,56 +61,61 @@ class TfLDisplayApp(App):
             return Static(f"Error: {str(e)}\n\n{str(df)[:500]}")
 
     async def _refresh_data(self) -> None:
-        """Refresh data every 5 seconds and update display."""
+        """Refresh data every 5 seconds and update display. 
+        All three data sources refresh independently and concurrently."""
         while True:
             try:
-                # Fetch fresh data - line status
-                self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)               
-                # Update DataTables
-                await self._update_tables()
-            
-                # Fetch fresh data - next tube or bus
-                self.data_dict['next_tube_and_bus_df'] = await _next_train_or_bus(self.client, self.dict_of_useful_tube_and_bus_stops)
-                # Update time
+                # Fetch all three data sources concurrently
+                await asyncio.gather(
+                    self._fetch_and_update_tube_status(),
+                    self._fetch_and_update_bus_data(),
+                    self._fetch_and_update_bike_data()
+                )
+                # Update time after all data fetches
                 self.current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                # Update DataTables
-                await self._update_tables()                
-            
-                # Fetch fresh data - boris bike
-                self.data_dict['boris_bike_df'] = await get_specific_boris_bike_info(self.client, self.dict_of_useful_bikepoints)
-                # Update DataTables
-                await self._update_tables()
-
+                
             except Exception as e:
-                print(f"Error refreshing data: {e}", severity="error")
-                #self.notify(f"Error refreshing data: {e}", severity="error")
+                self.notify(f"Error refreshing data: {e}", severity="error")
             
-            # Wait 5 seconds before next refresh
-            # Detian comment: for this row here, can you add the "finally" clause, and make it part of the try: and except: block? I think your VS code error comes from not having the "finally" condition, that's why you're gettimg that error message on the readme.md, i.e. replace row 91 with
-            #finally:
-            #    await asyncio.sleep(5)     
-            await asyncio.sleep(5)
+            finally:
+                # Wait 5 seconds before next refresh - always runs
+                await asyncio.sleep(5)
 
-    async def _update_tables(self) -> None:
-        """Update the DataTable widgets with new data."""
+    async def _fetch_and_update_tube_status(self) -> None:
+        """Fetch tube line status independently."""
         try:
-            # Update left table
-            left_table = self.query_one("#next_tube_and_bus_df", DataTable)
-            left_df = self.data_dict.get("next_tube_and_bus_df", pd.DataFrame())
-            await self._refresh_datatable(left_table, left_df)
-            
-            # Update top-right table
-            top_table = self.query_one("#status_df", DataTable)
-            top_df = self.data_dict.get("tube_line_status", pd.DataFrame())
-            await self._refresh_datatable(top_table, top_df)
-            
-            # Update bottom-right table
-            bottom_table = self.query_one("#boris_bike_df", DataTable)
-            bottom_df = self.data_dict.get("boris_bike_df", pd.DataFrame())
-            await self._refresh_datatable(bottom_table, bottom_df)
-            
+            self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)
+            if not self.data_dict['tube_line_status'].empty:
+                await self._update_table_by_id("#status_df", self.data_dict.get("tube_line_status", pd.DataFrame()))
         except Exception as e:
-            pass  # Silently fail if tables not yet rendered
+            pass  # Individual fetch failed, will retry on next cycle
+
+    async def _fetch_and_update_bus_data(self) -> None:
+        """Fetch next tube/bus data independently."""
+        try:
+            self.data_dict['next_tube_and_bus_df'] = await _next_train_or_bus(self.client, self.dict_of_useful_tube_and_bus_stops)
+            print(self.data_dict['next_tube_and_bus_df'])
+            if not self.data_dict['next_tube_and_bus_df'].empty:
+                await self._update_table_by_id("#next_tube_and_bus_df", self.data_dict.get("next_tube_and_bus_df", pd.DataFrame()))
+        except Exception as e:
+            pass  # Individual fetch failed, will retry on next cycle
+
+    async def _fetch_and_update_bike_data(self) -> None:
+        """Fetch bike point data independently."""
+        try:
+            self.data_dict['boris_bike_df'] = await get_specific_boris_bike_info(self.client, self.dict_of_useful_bikepoints)
+            if not self.data_dict['boris_bike_df'].empty:
+                await self._update_table_by_id("#boris_bike_df", self.data_dict.get("boris_bike_df", pd.DataFrame()))
+        except Exception as e:
+            pass  # Individual fetch failed, will retry on next cycle
+
+    async def _update_table_by_id(self, table_id: str, df: pd.DataFrame) -> None:
+        """Update a specific table by ID."""
+        try:
+            table = self.query_one(table_id, DataTable)
+            await self._refresh_datatable(table, df)
+        except Exception:
+            pass  # Table not yet rendered
 
     async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> None:
         """Clear and repopulate a DataTable with new data."""

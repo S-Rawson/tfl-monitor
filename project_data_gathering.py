@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from queries_to_bikepoint_api_async import get_all_boris_bike_info, get_specific_boris_bike_info
 from queries_to_line_api_async import _get_list_modes, _get_tube_lines, _all_valid_routes_all_lines, _all_valid_routes_single_line, _get_tube_status_update, _get_stops_on_a_line, _next_train_or_bus
 
-load_dotenv(dotenv_path="config.env")
+load_dotenv(dotenv_path="config_dummy.env")
 
 
 async def constant_data_pull():

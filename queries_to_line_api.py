@@ -147,7 +147,7 @@ if __name__ == "__main__":
     tube_line_status = asyncio.run(_get_tube_status_update())
     
     #more detailed checks for my needs that will get into the dashboard
-    lines_to_check = ["northern", "35", "37", "155"]
+    lines_to_check = ["victoria", "45", "37", "155"]
     #this tells me which stops exist on different lines but will not be used in the dashboard
     stops = asyncio.run(_get_stops_on_a_line(lines_to_check))
 
