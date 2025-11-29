@@ -22,9 +22,9 @@ async def get_all_boris_bike_info():
     for x in range(len(bikepoint_json)):
         list_of_bikepoint_dict[bikepoint_json[x]["id"]] = bikepoint_json[x]["commonName"] 
     #finding a specific bikepoint based on a string
-    # for key, body in list_of_bikepoint_dict.items():
-    #     if "Caldwell" in body:
-    #         print(key, body)
+    for key, body in list_of_bikepoint_dict.items():
+        if "Queen Victoria" in body:
+            print(key, body)
     return list_of_bikepoint_dict
 
 
@@ -57,9 +57,11 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
 
 if __name__ == "__main__":
     dict_of_useful_bikepoints = {
-    "BikePoints_355":"Clapham Common Station, Clapham Common",
-    "BikePoints_808":"Gauden Road, Clapham",
-    "BikePoints_55":"Finsbury Circus, Liverpool Street",
+    "BikePoints_753":"Clapham South, Clapham South",
+    "BikePoints_866":"Limburg Road, Clapham Junction",
+    "BikePoints_532":"Jubilee Plaza, Canary Wharf",
+    "BikePoints_551":"Import Dock, Canary Wharf",
+    "BikePoints_136":"Queen Victoria Street, St. Paul's",
     }
     
     bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints))

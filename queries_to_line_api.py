@@ -147,22 +147,16 @@ if __name__ == "__main__":
     tube_line_status = asyncio.run(_get_tube_status_update())
     
     #more detailed checks for my needs that will get into the dashboard
-    lines_to_check = ["victoria", "45", "37", "155"]
+    lines_to_check = ["northern", "G1", "249", "155"]
     #this tells me which stops exist on different lines but will not be used in the dashboard
     stops = asyncio.run(_get_stops_on_a_line(lines_to_check))
 
     dict_of_useful_tube_and_bus_stops={
-    "Clapham Common Underground Station":("940GZZLUCPC","northern"),
-    'Clapham Common Station Bus 1':('490000050E',"35"),#northbound
-    'Clapham Common Station Bus 2':('490000050K',"35"),#southbound to CJ
-    'Clapham Common Station Bus 3':('490000050E',"37"),#northbound
-    'Clapham Common Station Bus 4':('490000050K',"37"),#southbound to CJ
-    'Clapham Common Station Bus 5':('490000050D',"155"),#northbound to Oval
-    'Clapham Common Station Bus 6':('490000050G',"155"),#southbound
-    'Oval Station Bus 1':('490000172Q',"155"),#northbound
-    'Oval Station Bus 2':('490000172R',"155"),#southbound to CC
-    'Dorset Road Oval 1':("490006134S", "155"),#southbound to CC - dorset road stop h
-    'Dorset Road Oval 2':("490006134N", "155"),
+    'Clapham South Underground Station':('940GZZLUCPS',"northern"),
+    'Clapham South Bus 1':('490000052SB',"G1"),#northbound
+    'Clapham South Bus 2':('490000052SD',"249"),#southbound to CJ
+    'Clapham South Bus 3':('490000052SC',"155"),#northbound
+    'Clapham South Bus 4':('490000052SD',"155"),#southbound to CJ
     }
     next_tube_and_bus = asyncio.run(_next_train_or_bus(dict_of_useful_tube_and_bus_stops))
 
