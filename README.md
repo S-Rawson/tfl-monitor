@@ -30,11 +30,7 @@ https://realtime.nationalrail.co.uk/LDBWS/docs/documentation.html
 ## Trying to run the code directly in the terminal 
 ran the following in my terminal 
 
-alexander@raspberrypi:~ $ source "/home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/activate" -- for this I am getting "permission denied"? any ideas?
-(.venv) alexander@raspberrypi:~ $ python '/home/alexander/Documents/Coding_Projects/tfl-monitor/display_code.py'
 
+source /home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/activate
 
-
-
-
-
+/home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/python /home/alexander/Documents/Coding_Projects/tfl-monitor/display_code.py

@@ -10,7 +10,7 @@ import pandas as pd
 import json
 
 # load environment variables from .env file
-load_dotenv(dotenv_path="config_dummy.env")
+# load_dotenv(dotenv_path="config.env")
 
 client = httpx.AsyncClient(
     headers={"Accept": "application/json"},

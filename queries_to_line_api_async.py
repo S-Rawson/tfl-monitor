@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 # Detian comment: again consider adding the typing to output and inputs for each function, like commented in queries_to_line_api.py
 
 # load environment variables from .env file
-load_dotenv(dotenv_path="config_dummy.env")
+# load_dotenv(dotenv_path="config.env")
 
 client = httpx.AsyncClient(
     headers={"Accept": "application/json"},

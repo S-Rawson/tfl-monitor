@@ -1,3 +1,5 @@
+#!/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/env python
+
 import pandas as pd
 import asyncio
 import json
@@ -11,6 +13,8 @@ from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Button, Static, Label
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
+from dotenv import load_dotenv
+from pathlib import Path
 
 client = httpx.AsyncClient(
     headers={"Accept": "application/json"},
@@ -208,6 +212,9 @@ class TfLDisplayApp(App):
 
 
 if __name__ == "__main__":
+    env_path = Path(__file__).parent / "config.env"
+    load_dotenv(env_path)
+
     # Gather initial data and run the textual app
     initial_data = asyncio.run(constant_data_pull())
 

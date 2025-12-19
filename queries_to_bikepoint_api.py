@@ -9,7 +9,7 @@ import pandas as pd
 import json
 
 # load environment variables from .env file
-load_dotenv(dotenv_path="config.env")
+# load_dotenv(dotenv_path="config.env")
 
 
 async def get_all_boris_bike_info():
@@ -55,15 +55,15 @@ async def get_specific_boris_bike_info(dict_of_useful_bikepoints):
     
     return bike_info_df
 
-if __name__ == "__main__":
-    dict_of_useful_bikepoints = {
-    "BikePoints_753":"Clapham South, Clapham South",
-    "BikePoints_866":"Limburg Road, Clapham Junction",
-    "BikePoints_532":"Jubilee Plaza, Canary Wharf",
-    "BikePoints_551":"Import Dock, Canary Wharf",
-    "BikePoints_136":"Queen Victoria Street, St. Paul's",
-    }
+# if __name__ == "__main__":
+#     # dict_of_useful_bikepoints = {
+#     # "BikePoints_753":"Clapham South, Clapham South",
+#     # "BikePoints_866":"Limburg Road, Clapham Junction",
+#     # "BikePoints_532":"Jubilee Plaza, Canary Wharf",
+#     # "BikePoints_551":"Import Dock, Canary Wharf",
+#     # "BikePoints_136":"Queen Victoria Street, St. Paul's",
+#     # }
     
-    bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints))
-    test = asyncio.run(get_all_boris_bike_info())
-    rich.print(bike_info)
+#     bike_info = asyncio.run(get_specific_boris_bike_info(dict_of_useful_bikepoints))
+#     test = asyncio.run(get_all_boris_bike_info())
+#     rich.print(bike_info)
