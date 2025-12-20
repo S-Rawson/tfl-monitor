@@ -13,6 +13,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Button, Static, Label
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
+from textual.theme import Theme
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -34,6 +35,7 @@ class TfLDisplayApp(App):
 
     CSS_PATH = "horizontal_layout.tcss"
     BINDINGS = [("q", "quit", "Quit")]
+    THEME = "dracula"
     
     # Reactive attribute to trigger data refresh
     current_time = reactive(str)
@@ -68,7 +70,13 @@ class TfLDisplayApp(App):
                 table.add_column(str(col))
             # add rows
             for _, row in df.iterrows():
-                table.add_row(*[str(x) for x in row.tolist()])
+                row_data = []
+                for col_name, value in zip(df.columns, row.tolist()):
+                    if col_name == "Status":
+                        row_data.append(self._get_colored_status(str(value)))
+                    else:
+                        row_data.append(str(value))
+                table.add_row(*row_data)
             return table
         except Exception as e:
             return Static(f"Error: {str(e)}\n\n{str(df)[:500]}")
@@ -155,11 +163,11 @@ class TfLDisplayApp(App):
     def compose(self) -> ComposeResult:
         """Compose the layout with header, main content, and exit button."""
         # Create tables with IDs
-        left_table = self._df_to_datatable(self.data_dict.get("next_tube_and_bus_df", pd.DataFrame()))
-        left_table.id = "next_tube_and_bus_df"
+        top_left_table = self._df_to_datatable(self.data_dict.get("next_tube_and_bus_df", pd.DataFrame()))
+        top_left_table.id = "next_tube_and_bus_df"
         
-        top_table = self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
-        top_table.id = "status_df"
+        status_table = self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
+        status_table.id = "status_table"
         
         bottom_table = self._df_to_datatable(self.data_dict.get("boris_bike_df", pd.DataFrame()))
         bottom_table.id = "boris_bike_df"
@@ -174,12 +182,12 @@ class TfLDisplayApp(App):
             ),
             # Main content: left table + right container
             Horizontal(
-                left_table,
                 Vertical(
-                    top_table,
+                    top_left_table,
                     bottom_table,
-                    id="right_container"
+                    id="left_container"
                 ),
+                status_table,
                 id="main_container"
             ),
             id="main_layout"
