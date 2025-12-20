@@ -114,10 +114,14 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
             new_row['modeName'] = next_transport_dict[y][z]["modeName"]
             if next_transport_dict[y][z]["modeName"] == "tube":
                 new_row['platformName'] = next_transport_dict[y][z]["platformName"][:10]
+                #shortening the name
+                #short_name = next_transport_dict[y][z]["stationName"][:14].replace("Common Underground Station", "C")
                 new_row['stationName'] = next_transport_dict[y][z]["stationName"][:14]
             elif next_transport_dict[y][z]["modeName"] == "bus":
                 new_row['platformName'] = next_transport_dict[y][z]["lineName"]
-                new_row['stationName'] = y[1]
+                #shortening the name
+                short_name = y[1].replace("Common Station", "C")
+                new_row['stationName'] = short_name
             new_row['expectedArrival'] = next_transport_dict[y][z]["expectedArrival"]
             if next_transport_dict[y][z]["currentLocation"]:
                 new_row['currentLocation'] = next_transport_dict[y][z]["currentLocation"]
@@ -128,14 +132,14 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
     eta_dashboard_df["expectedArrival"] = pd.to_datetime(eta_dashboard_df["expectedArrival"], format='%Y-%m-%dT%H:%M:%SZ')
     eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["expectedArrival"] - current_dateTime
     eta_dashboard_df.sort_values(['modeName', "stationName", 'expectedArrival'], ascending=[False, True, True], inplace=True)
-    eta_dashboard_df["expectedArrival"] = eta_dashboard_df["expectedArrival"].dt.time
+    #eta_dashboard_df["expectedArrival"] = eta_dashboard_df["expectedArrival"].dt.time
     # Convert timedelta to minutes and seconds format    
     eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["TimeToArrival"].apply(format_timedelta)
     eta_dashboard_bus = eta_dashboard_df[eta_dashboard_df["modeName"] == "bus"]
     eta_dashboard_tube = eta_dashboard_df[eta_dashboard_df["modeName"] == "tube"]
     eta_dashboard_tube_mini = eta_dashboard_tube[:8]
     eta_dashboard_combo = pd.concat([eta_dashboard_tube_mini, eta_dashboard_bus], axis=0)
-    eta_dashboard_combo.drop(["modeName"], inplace=True, axis=1)
+    eta_dashboard_combo.drop(["modeName", "expectedArrival"], inplace=True, axis=1)
     eta_dashboard_combo.rename(columns={"expectedArrival":"expected"}, inplace=True)
     return eta_dashboard_combo
 
@@ -145,7 +149,7 @@ def convert_str_to_datetime(str_data):
     datetime_str = dt.strptime(str_data, format)
     return datetime_str
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     # #generic tube information functions
     # list_of_modes = asyncio.run(_get_list_modes(client))
     # list_of_tube_lines = asyncio.run(_get_tube_lines(client, "tube"))
@@ -159,8 +163,8 @@ if __name__ == "__main__":
     # #this tells me which stops exist on different lines but will not be used in the dashboard
     # stops = asyncio.run(_get_stops_on_a_line(client, lines_to_check))
 
-    dict_of_useful_tube_and_bus_stops = json.loads((os.getenv("dict_of_useful_tube_and_bus_stops")))
-    next_tube_and_bus = asyncio.run(_next_train_or_bus(client, dict_of_useful_tube_and_bus_stops))
+    # dict_of_useful_tube_and_bus_stops = json.loads((os.getenv("dict_of_useful_tube_and_bus_stops")))
+    # next_tube_and_bus = asyncio.run(_next_train_or_bus(client, dict_of_useful_tube_and_bus_stops))
 
 
-    print("stops")
+    #print("stops")

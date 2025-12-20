@@ -57,9 +57,9 @@ async def get_specific_boris_bike_info(client, dict_of_useful_bikepoints):
     
     return bike_info_df
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
-    bike_info = asyncio.run(get_specific_boris_bike_info(client, dict_of_useful_bikepoints))
-    test = asyncio.run(get_all_boris_bike_info(client))
-    rich.print(bike_info)
+#     dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
+#     bike_info = asyncio.run(get_specific_boris_bike_info(client, dict_of_useful_bikepoints))
+#     test = asyncio.run(get_all_boris_bike_info(client))
+#     rich.print(bike_info)

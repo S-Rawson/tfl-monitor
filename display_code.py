@@ -214,15 +214,18 @@ class TfLDisplayApp(App):
 if __name__ == "__main__":
     env_path = Path(__file__).parent / "config.env"
     load_dotenv(env_path)
-
+    
+    dict_of_useful_tube_and_bus_stops = json.loads(os.getenv("dict_of_useful_tube_and_bus_stops"))
+    dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
+    
     # Gather initial data and run the textual app
-    initial_data = asyncio.run(constant_data_pull())
+    initial_data = asyncio.run(constant_data_pull(dict_of_useful_tube_and_bus_stops, dict_of_useful_bikepoints))
 
     app = TfLDisplayApp()
     app.data_dict = initial_data
     app.client = client
-    app.dict_of_useful_tube_and_bus_stops = json.loads(os.getenv("dict_of_useful_tube_and_bus_stops"))
-    app.dict_of_useful_bikepoints = json.loads((os.getenv("dict_of_useful_bikepoints")))
+    app.dict_of_useful_tube_and_bus_stops = dict_of_useful_tube_and_bus_stops
+    app.dict_of_useful_bikepoints = dict_of_useful_bikepoints
 
     # run the TUI
     app.run()
