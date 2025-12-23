@@ -47,11 +47,11 @@ class TfLDisplayApp(App):
         self.dict_of_useful_tube_and_bus_stops = {}
         self.dict_of_useful_bikepoints = {}
 
-    def _get_colored_status(self, status: str) -> str:
+    def _get_colored_status(self, col_name:str, status: str, row: pd.Series) -> str:
         """Return status with color markup based on content."""
-        if "good service" in status.lower():
+        if "good service" in row['Status'].lower():
             return f"[green]{status}[/green]"
-        elif "minor delays" in status.lower():
+        elif "minor delays" in row['Status'].lower():
             return f"[orange]{status}[/orange]"
         else:
             return f"[red]{status}[/red]"
@@ -67,13 +67,16 @@ class TfLDisplayApp(App):
             table = DataTable(zebra_stripes=True)
             # add columns
             for col in df.columns:
-                table.add_column(str(col))
+                if col != "Status":
+                    table.add_column(str(col))
             # add rows
             for _, row in df.iterrows():
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
-                    if col_name == "Status":
-                        row_data.append(self._get_colored_status(str(value)))
+                    if "Status" in df.columns and col_name == "Line":
+                        row_data.append(self._get_colored_status(str(col_name), str(value), row))
+                    elif col_name == "Status":
+                        row_data
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
@@ -108,6 +111,7 @@ class TfLDisplayApp(App):
             self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)
             if not self.data_dict['tube_line_status'].empty:
                 await self._update_table_by_id("#status_df", self.data_dict.get("tube_line_status", pd.DataFrame()))
+                print(self.data_dict["tube_line_status"])
         except Exception as e:
             pass  # Individual fetch failed, will retry on next cycle
 
@@ -152,8 +156,8 @@ class TfLDisplayApp(App):
             for _, row in df.iterrows():
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
-                    if col_name == "Status":
-                        row_data.append(self._get_colored_status(str(value)))
+                    if "Status" in df.columns and col_name == "Line":
+                        row_data.append(self._get_colored_status(str(col_name), str(value), row))
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)

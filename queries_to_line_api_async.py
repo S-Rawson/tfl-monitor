@@ -100,7 +100,7 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
     #Get the list of arrival predictions for given line ids based at the given stop
     #https://api-portal.tfl.gov.uk/api-details#api=Line&operation=Line_ArrivalsWithStopPointByPathIdsPathStopPointIdQueryDirectionQueryDestina
     next_transport_dict = {}
-    eta_dashboard_cols = ['modeName', 'stationName', 'platformName', 'expectedArrival', "TimeToArrival", 'currentLocation',]
+    eta_dashboard_cols = ['modeName', 'stationName', 'platformName', 'expectedArrival', "TimeToArrival"]
     eta_dashboard_df = pd.DataFrame(columns=eta_dashboard_cols)
     for station, line in dict_of_useful_tube_and_bus_stops.values():
         schedule_raw = await client.get(f"Line/{line}/Arrivals/{station}")
@@ -123,8 +123,8 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
                 short_name = y[1].replace("Common Station", "C")
                 new_row['stationName'] = short_name
             new_row['expectedArrival'] = next_transport_dict[y][z]["expectedArrival"]
-            if next_transport_dict[y][z]["currentLocation"]:
-                new_row['currentLocation'] = next_transport_dict[y][z]["currentLocation"]
+            #if next_transport_dict[y][z]["currentLocation"]:
+            #    new_row['currentLocation'] = next_transport_dict[y][z]["currentLocation"]
             eta_dashboard_df.loc[len(eta_dashboard_df)] = new_row#platformName will also be lineName # Detian comment : check indexing of the df.loc
     
     #now converting the arrival time into a datetime format

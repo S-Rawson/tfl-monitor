@@ -41,7 +41,7 @@ async def get_specific_boris_bike_info(client, dict_of_useful_bikepoints):
         #info from the bikepoint
         new_row = {}
         # new_row["id"] = bikepoint_info["id"]
-        new_row["commonName"] = bikepoint_info["commonName"]
+        new_row["commonName"], _ = bikepoint_info["commonName"].split(",")
         for x in range(len(bikepoint_info["additionalProperties"])):
             if bikepoint_info["additionalProperties"][x]["key"] == "NbBikes":
                 new_row["NbBikes"] = bikepoint_info["additionalProperties"][x]["value"]
