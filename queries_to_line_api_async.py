@@ -137,7 +137,7 @@ async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):
     eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["TimeToArrival"].apply(format_timedelta)
     eta_dashboard_bus = eta_dashboard_df[eta_dashboard_df["modeName"] == "bus"]
     eta_dashboard_tube = eta_dashboard_df[eta_dashboard_df["modeName"] == "tube"]
-    eta_dashboard_tube_mini = eta_dashboard_tube[:8]
+    eta_dashboard_tube_mini = eta_dashboard_tube[:4]
     eta_dashboard_combo = pd.concat([eta_dashboard_tube_mini, eta_dashboard_bus], axis=0)
     eta_dashboard_combo.drop(["modeName", "expectedArrival"], inplace=True, axis=1)
     eta_dashboard_combo.rename(columns={"expectedArrival":"expected"}, inplace=True)
