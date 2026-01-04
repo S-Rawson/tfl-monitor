@@ -19,18 +19,8 @@ The touchscreen display would have at all times (refreshing every second or so) 
   - how many bikes are available
   - how many spaces are available
 
-## stretch goal
-- If I can get train timetables, the time for next two trains from Euston to Liverpool.
-https://www.nationalrail.co.uk/developers/darwin-data-feeds/
-
-Train timetable time - think I will need Kiota after all
-https://realtime.nationalrail.co.uk/LDBWS/docs/documentation.html
-
-
 ## Trying to run the code directly in the terminal 
 ran the following in my terminal 
 
-
-source /home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/activate
-
-/home/alexander/Documents/Coding_Projects/tfl-monitor/.venv/bin/python /home/alexander/Documents/Coding_Projects/tfl-monitor/display_code.py
+source /home/user/Documents/Coding_Projects/tfl-monitor/.venv/bin/activate
+ /home/user/Documents/Coding_Projects/tfl-monitor/display_code.py
