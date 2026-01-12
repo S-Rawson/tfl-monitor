@@ -52,7 +52,7 @@ class TfLDisplayApp(App):
         if "good service" in row['Status'].lower():
             return f"[green]{status}[/green]"
         elif "minor delays" in row['Status'].lower():
-            return f"[orange]{status}[/orange]"
+            return f"[yellow]{status}[/yellow]"
         else:
             return f"[red]{status}[/red]"
 
@@ -62,6 +62,8 @@ class TfLDisplayApp(App):
         If `df` is not a DataFrame, returns a Static widget with stringified content.
         """
         try:
+    
+
             if not hasattr(df, "columns"):
                 raise TypeError
             table = DataTable(zebra_stripes=True)
@@ -76,7 +78,7 @@ class TfLDisplayApp(App):
                     if "Status" in df.columns and col_name == "Line":
                         row_data.append(self._get_colored_status(str(col_name), str(value), row))
                     elif col_name == "Status":
-                        row_data
+                        pass
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
@@ -145,19 +147,23 @@ class TfLDisplayApp(App):
     async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> None:
         """Clear and repopulate a DataTable with new data."""
         try:
-            # Clear existing data
-            table.clear()
+            # Clear existing rows only
+            table.clear(columns=False)
             
-            # Add columns
-            # for col in df.columns:
-            #     table.add_column(str(col))
-            
-            # Add rows
+            # Only add columns on first load (if table is empty)
+            if len(table.columns) == 0:
+                for col in df.columns:
+                    if col != "Status":
+                        table.add_column(str(col))
+      
+            # Add rows with coloring
             for _, row in df.iterrows():
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
                     if "Status" in df.columns and col_name == "Line":
                         row_data.append(self._get_colored_status(str(col_name), str(value), row))
+                    elif col_name == "Status":
+                        pass  # Skip Status column
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
