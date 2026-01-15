@@ -75,8 +75,8 @@ class TfLDisplayApp(App):
             table = DataTable(zebra_stripes=True)
             # add columns
             for col in df.columns:
-                if col != "Status":
-                    table.add_column(str(col))
+            #     if col != "Status":
+                     table.add_column(str(col))
             # add rows
             for _, row in df.iterrows():
                 row_data = []
@@ -152,7 +152,7 @@ class TfLDisplayApp(App):
         except Exception:
             pass  # Table not yet rendered
 
-    async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> None:
+    async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> DataTable:
         """Clear and repopulate a DataTable with new data."""
         try:
             # Clear existing rows only
@@ -160,9 +160,9 @@ class TfLDisplayApp(App):
             
             # Only add columns on first load (if table is empty)
             # if len(table.columns) == 0:
-            #for col in df.columns:
+            for col in df.columns:
             #         if col != "Status":
-            #    table.add_column(str(col))
+                table.add_column(str(col))
       
             # Add rows with coloring
             for _, row in df.iterrows():
