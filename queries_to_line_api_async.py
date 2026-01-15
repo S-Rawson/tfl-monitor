@@ -8,6 +8,7 @@ import rich
 import requests
 from datetime import datetime as dt
 from dotenv import load_dotenv
+import random
 
 # Detian comment: again consider adding the typing to output and inputs for each function, like commented in queries_to_line_api.py
 
@@ -93,7 +94,16 @@ async def _get_tube_status_update(client):
         tube_line_status.reset_index(inplace=True)
         tube_line_status.rename(columns={'index':'Line'}, inplace=True)
         # Detian comment: same comments here as the comment for rows 79-85 of query_to_line_api.py, considering using list/record dictionary orientation
-
+        rand_no = random.randint(0, 2)
+        if rand_no == 0:
+            rand_text = "Good Service"
+        elif rand_no == 1:
+            rand_text = "Minor Delays"
+        else:
+            rand_text = "Severe Delays"
+        nam1 = "test line " + str(rand_no)
+        tube_line_status.loc[len(tube_line_status)] = [nam1, rand_text]
+        
     return tube_line_status
 
 async def _next_train_or_bus(client, dict_of_useful_tube_and_bus_stops):

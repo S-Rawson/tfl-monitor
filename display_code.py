@@ -64,7 +64,13 @@ class TfLDisplayApp(App):
         try:
     
 
-            if not hasattr(df, "columns"):
+            async def _update_table_by_id(self, table_id: str, df: pd.DataFrame) -> None:
+                """Update a specific table by ID."""
+                try:
+                    table = self.query_one(table_id, DataTable)
+                    await self._refresh_datatable(table, df)
+                except Exception as e:
+                    print(f"Error updating table {table_id}: {e}")  # Debug logging            if not hasattr(df, "columns"):
                 raise TypeError
             table = DataTable(zebra_stripes=True)
             # add columns
@@ -112,8 +118,8 @@ class TfLDisplayApp(App):
         try:
             self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)
             if not self.data_dict['tube_line_status'].empty:
-                await self._update_table_by_id("#status_df", self.data_dict.get("tube_line_status", pd.DataFrame()))
-                print(self.data_dict["tube_line_status"])
+                await self._update_table_by_id("#status_table", self.data_dict.get("tube_line_status", pd.DataFrame()))
+                #print(self.data_dict["tube_line_status"])
         except Exception as e:
             pass  # Individual fetch failed, will retry on next cycle
 
@@ -139,8 +145,10 @@ class TfLDisplayApp(App):
     async def _update_table_by_id(self, table_id: str, df: pd.DataFrame) -> None:
         """Update a specific table by ID."""
         try:
-            table = self.query_one(table_id, DataTable)
-            await self._refresh_datatable(table, df)
+            self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
+            #test_table = self._df_to_datatable(self, df)
+            #table = self.query_one(table_id, DataTable)
+            #await self._refresh_datatable(table, df)
         except Exception:
             pass  # Table not yet rendered
 
@@ -148,13 +156,13 @@ class TfLDisplayApp(App):
         """Clear and repopulate a DataTable with new data."""
         try:
             # Clear existing rows only
-            table.clear(columns=False)
+            table.clear()
             
             # Only add columns on first load (if table is empty)
-            if len(table.columns) == 0:
-                for col in df.columns:
-                    if col != "Status":
-                        table.add_column(str(col))
+            # if len(table.columns) == 0:
+            #for col in df.columns:
+            #         if col != "Status":
+            #    table.add_column(str(col))
       
             # Add rows with coloring
             for _, row in df.iterrows():
@@ -167,6 +175,7 @@ class TfLDisplayApp(App):
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
+            return table
         except Exception:
             pass  # Skip if data invalid
 
