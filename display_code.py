@@ -75,9 +75,9 @@ class TfLDisplayApp(App):
             table = DataTable(zebra_stripes=True)
             # add columns
             for col in df.columns:
-            #     if col != "Status":
+                 if col != "Status":
                      table.add_column(str(col))
-            # add rows
+            # add row
             for _, row in df.iterrows():
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
@@ -145,26 +145,25 @@ class TfLDisplayApp(App):
     async def _update_table_by_id(self, table_id: str, df: pd.DataFrame) -> None:
         """Update a specific table by ID."""
         try:
-            self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
-            #test_table = self._df_to_datatable(self, df)
-            #table = self.query_one(table_id, DataTable)
-            #await self._refresh_datatable(table, df)
-        except Exception:
-            pass  # Table not yet rendered
+            table = self.query_one(table_id, DataTable)
+            await self._refresh_datatable(table, df)
+        except Exception as e:
+            print(f"Error updating table {table_id}: {e}") 
 
     async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> DataTable:
         """Clear and repopulate a DataTable with new data."""
         try:
             # Clear existing rows only
-            table.clear()
+            table.clear(columns=False)
             
             # Only add columns on first load (if table is empty)
-            # if len(table.columns) == 0:
-            for col in df.columns:
-            #         if col != "Status":
-                table.add_column(str(col))
-      
+            if len(table.columns) == 0:
+                for col in df.columns:
+                    if col != "Status":
+                        table.add_column(str(col))
+        
             # Add rows with coloring
+            
             for _, row in df.iterrows():
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
