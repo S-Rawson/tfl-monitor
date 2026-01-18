@@ -4,14 +4,14 @@ import pandas as pd
 import asyncio
 import yaml
 from datetime import datetime
-from queries_to_bikepoint_api_async import (
+from bikepoint import (
     get_specific_boris_bike_info,
 )
-from queries_to_line_api_async import (
+from line import (
     _get_tube_status_update,
     _next_train_or_bus,
 )
-from queries_overground import get_live_overground_trains
+from overground import get_live_overground_trains
 import httpx
 from textual.app import App, ComposeResult
 from textual.widgets import DataTable, Button, Static, Label
