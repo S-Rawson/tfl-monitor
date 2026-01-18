@@ -1,5 +1,0 @@
-pandas
-datetime
-poetry
-microsoft-kiota-abstractions
-asynchio
