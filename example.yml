@@ -1,0 +1,22 @@
+refresh_interval_seconds: 30
+
+bikepoints:
+  BikePoints_1: "Location"
+
+tube_and_bus_stops:
+  Stop:
+    id: "ID1"
+    lines:
+      - "line1"
+
+overground_api_url: ""
+overground_api_username: ""
+overground_api_password: ""
+
+# Define routes to query. Each entry should contain 'from' and 'to' station codes.
+# If 'bidirectional' is true, both directions will be queried.
+overground_routes:
+  - name: "Route 1"
+    from: "STN1"
+    to: "STN2"
+    bidirectional: true

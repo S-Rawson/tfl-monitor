@@ -47,7 +47,7 @@ Screen {
 }
 
 #left_container {
-    width: 4fr;
+    width: 3fr;
     height: 100%;
     layout: vertical;
     border: solid blue;
