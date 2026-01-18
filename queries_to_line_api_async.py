@@ -57,9 +57,7 @@ async def _all_valid_routes_all_lines(client, modes):
     # Get all valid routes for all lines, including the name and id of the originating and terminating stops for each route.
     # https://api-portal.tfl.gov.uk/api-details#api=Line&operation=Line_RouteByModeByPathModesQueryServiceTypes
     service_type = "Regular"  # or 'Night'
-    all_lines_routes = await client.get(
-        f"Line/Mode/{modes}/Route?serviceTypes={service_type}"
-    )
+    all_lines_routes = await client.get(f"Line/Mode/{modes}/Route?serviceTypes={service_type}")
     all_lines_routes_clean = json.loads(all_lines_routes.text)
     return all_lines_routes_clean
 
@@ -86,8 +84,7 @@ async def _get_stops_on_a_line(client, lines_to_check):
         )
         stops_on_line_neat = json.loads(stops_on_line.text)
         stops = [
-            {"id": item["naptanId"], "name": item["commonName"]}
-            for item in stops_on_line_neat
+            {"id": item["naptanId"], "name": item["commonName"]} for item in stops_on_line_neat
         ]
         stops_dict[transport] = stops
     return stops_dict
@@ -177,9 +174,7 @@ async def _next_train_or_bus(client, tube_and_bus_stops):
             new_row["stationName"] = y[1]
             mode = next_transport_dict[y][z].get("modeName")
             if mode == "tube":
-                new_row["platformName"] = next_transport_dict[y][z].get(
-                    "platformName", ""
-                )[:10]
+                new_row["platformName"] = next_transport_dict[y][z].get("platformName", "")[:10]
             elif mode == "bus":
                 new_row["platformName"] = next_transport_dict[y][z].get("lineName", "")
             new_row["expectedArrival"] = next_transport_dict[y][z]["expectedArrival"]
@@ -192,9 +187,7 @@ async def _next_train_or_bus(client, tube_and_bus_stops):
     eta_dashboard_df["expectedArrival"] = pd.to_datetime(
         eta_dashboard_df["expectedArrival"], format="%Y-%m-%dT%H:%M:%SZ"
     )
-    eta_dashboard_df["TimeToArrival"] = (
-        eta_dashboard_df["expectedArrival"] - current_dateTime
-    )
+    eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["expectedArrival"] - current_dateTime
     eta_dashboard_df.sort_values(
         ["modeName", "stationName", "expectedArrival"],
         ascending=[False, True, True],
@@ -202,15 +195,11 @@ async def _next_train_or_bus(client, tube_and_bus_stops):
     )
     # eta_dashboard_df["expectedArrival"] = eta_dashboard_df["expectedArrival"].dt.time
     # Convert timedelta to minutes and seconds format
-    eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["TimeToArrival"].apply(
-        format_timedelta
-    )
+    eta_dashboard_df["TimeToArrival"] = eta_dashboard_df["TimeToArrival"].apply(format_timedelta)
     eta_dashboard_bus = eta_dashboard_df[eta_dashboard_df["modeName"] == "bus"]
     eta_dashboard_tube = eta_dashboard_df[eta_dashboard_df["modeName"] == "tube"]
     eta_dashboard_tube_mini = eta_dashboard_tube[:4]
-    eta_dashboard_combo = pd.concat(
-        [eta_dashboard_tube_mini, eta_dashboard_bus], axis=0
-    )
+    eta_dashboard_combo = pd.concat([eta_dashboard_tube_mini, eta_dashboard_bus], axis=0)
     eta_dashboard_combo.drop(["modeName", "expectedArrival"], inplace=True, axis=1)
     eta_dashboard_combo.rename(columns={"expectedArrival": "expected"}, inplace=True)
     return eta_dashboard_combo
@@ -221,24 +210,3 @@ def convert_str_to_datetime(str_data):
     format = "%Y-%m-%dT%H:%M:%SZ"
     datetime_str = dt.strptime(str_data, format)
     return datetime_str
-
-
-# if __name__ == "__main__":
-# #generic tube information functions
-# list_of_modes = asyncio.run(_get_list_modes(client))
-# list_of_tube_lines = asyncio.run(_get_tube_lines(client, "tube"))
-# routes_all_lines = asyncio.run(_all_valid_routes_all_lines(client, "tube"))
-# routes_single_line = asyncio.run(_all_valid_routes_single_line(client, 'northern'))
-# # in dashboard
-# tube_line_status = asyncio.run(_get_tube_status_update(client))
-
-# #more detailed checks for my needs that will get into the dashboard
-# lines_to_check = ["northern", "149", "68", "165"]
-# #this tells me which stops exist on different lines but will not be used in the dashboard
-# stops = asyncio.run(_get_stops_on_a_line(client, lines_to_check))
-
-# tube_and_bus_stops = json.loads((os.getenv("tube_and_bus_stops")))
-# next_tube_and_bus = asyncio.run(_next_train_or_bus(client, tube_and_bus_stops))
-
-
-# print("stops")

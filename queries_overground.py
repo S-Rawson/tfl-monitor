@@ -230,7 +230,9 @@ class Overground:
         return df_limited
 
 
-async def get_live_overground_trains(client: httpx.AsyncClient, routes: list, api_url: str, auth: tuple | None = None) -> pd.DataFrame:
+async def get_live_overground_trains(
+    client: httpx.AsyncClient, routes: list, api_url: str, auth: tuple | None = None
+) -> pd.DataFrame:
     """Compatibility wrapper matching the previous module function signature.
 
     Creates an Overground and delegates the work to it.

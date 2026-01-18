@@ -21,9 +21,7 @@ async def get_all_boris_bike_info(client):
     bikepoint_json = json.loads(bb_info.text)
     list_of_bikepoint_dict = {}
     for x in range(len(bikepoint_json)):
-        list_of_bikepoint_dict[bikepoint_json[x]["id"]] = bikepoint_json[x][
-            "commonName"
-        ]
+        list_of_bikepoint_dict[bikepoint_json[x]["id"]] = bikepoint_json[x]["commonName"]
     return list_of_bikepoint_dict
 
 
@@ -70,11 +68,3 @@ async def get_specific_boris_bike_info(client, bikepoints):
         bike_info_df.loc[len(bike_info_df)] = new_row
 
     return bike_info_df
-
-
-# if __name__ == "__main__":
-
-#     bikepoints = json.loads((os.getenv("bikepoints")))
-#     bike_info = asyncio.run(get_specific_boris_bike_info(client, bikepoints))
-#     test = asyncio.run(get_all_boris_bike_info(client))
-#     rich.print(bike_info)

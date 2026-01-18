@@ -4,7 +4,6 @@ import pandas as pd
 import asyncio
 import yaml
 from datetime import datetime
-from project_data_gathering import constant_data_pull
 from queries_to_bikepoint_api_async import (
     get_specific_boris_bike_info,
 )
@@ -100,9 +99,7 @@ class TfLDisplayApp(App):
         """
         try:
 
-            async def _update_table_by_id(
-                self, table_id: str, df: pd.DataFrame
-            ) -> None:
+            async def _update_table_by_id(self, table_id: str, df: pd.DataFrame) -> None:
                 """Update a specific table by ID."""
                 try:
                     table = self.query_one(table_id, DataTable)
@@ -121,9 +118,7 @@ class TfLDisplayApp(App):
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
                     if "Status" in df.columns and col_name == "Line":
-                        row_data.append(
-                            self._get_colored_status(str(col_name), str(value), row)
-                        )
+                        row_data.append(self._get_colored_status(str(col_name), str(value), row))
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
@@ -163,9 +158,7 @@ class TfLDisplayApp(App):
     async def _fetch_and_update_tube_status(self) -> None:
         """Fetch tube line status independently."""
         try:
-            self.data_dict["tube_line_status"] = await _get_tube_status_update(
-                self.client
-            )
+            self.data_dict["tube_line_status"] = await _get_tube_status_update(self.client)
             if not self.data_dict["tube_line_status"].empty:
                 await self._update_table_by_id(
                     "#status_table",
@@ -228,9 +221,7 @@ class TfLDisplayApp(App):
         except Exception as e:
             logger.exception("Error updating table %s: %s", table_id, e)
 
-    async def _refresh_datatable(
-        self, table: DataTable, df: pd.DataFrame
-    ) -> DataTable | None:
+    async def _refresh_datatable(self, table: DataTable, df: pd.DataFrame) -> DataTable | None:
         """Clear and repopulate a DataTable with new data."""
         try:
             # Clear existing rows only
@@ -247,9 +238,7 @@ class TfLDisplayApp(App):
                 row_data = []
                 for col_name, value in zip(df.columns, row.tolist()):
                     if "Status" in df.columns and col_name == "Line":
-                        row_data.append(
-                            self._get_colored_status(str(col_name), str(value), row)
-                        )
+                        row_data.append(self._get_colored_status(str(col_name), str(value), row))
                     else:
                         row_data.append(str(value))
                 table.add_row(*row_data)
@@ -266,14 +255,10 @@ class TfLDisplayApp(App):
         )
         top_left_table.id = "next_tube_and_bus_df"
 
-        status_table = self._df_to_datatable(
-            self.data_dict.get("tube_line_status", pd.DataFrame())
-        )
+        status_table = self._df_to_datatable(self.data_dict.get("tube_line_status", pd.DataFrame()))
         status_table.id = "status_table"
 
-        bottom_table = self._df_to_datatable(
-            self.data_dict.get("boris_bike_df", pd.DataFrame())
-        )
+        bottom_table = self._df_to_datatable(self.data_dict.get("boris_bike_df", pd.DataFrame()))
         bottom_table.id = "boris_bike_df"
         overground_table = self._df_to_datatable(
             self.data_dict.get("overground_df", pd.DataFrame())
@@ -290,9 +275,7 @@ class TfLDisplayApp(App):
             ),
             # Main content: left table + right container
             Horizontal(
-                Vertical(
-                    top_left_table, bottom_table, overground_table, id="left_container"
-                ),
+                Vertical(top_left_table, bottom_table, overground_table, id="left_container"),
                 # Put the status table in a Vertical so we can display a countdown above it
                 Vertical(
                     Static(str(self.refresh_countdown), id="refresh_countdown"),
@@ -343,6 +326,19 @@ class TfLDisplayApp(App):
             pass
 
 
+async def constant_data_pull(tube_and_bus_stops, bikepoints):
+    data_dict = {}
+    tube_line_status = await _get_tube_status_update(client)
+    data_dict["tube_line_status"] = tube_line_status
+
+    next_tube_and_bus_df = await _next_train_or_bus(client, tube_and_bus_stops)
+    data_dict["next_tube_and_bus_df"] = next_tube_and_bus_df
+
+    boris_bike_df = await get_specific_boris_bike_info(client, bikepoints)
+    data_dict["boris_bike_df"] = boris_bike_df
+    return data_dict
+
+
 if __name__ == "__main__":
     # Load configuration from YAML for better readability (config.yml)
     config_path = Path(__file__).parent / "config.yml"
@@ -383,9 +379,7 @@ if __name__ == "__main__":
     app.overground_auth = overground_auth
     # Initial overground fetch (best-effort)
     initial_overground = asyncio.run(
-        get_live_overground_trains(
-            client, overground_routes, overground_api_url, overground_auth
-        )
+        get_live_overground_trains(client, overground_routes, overground_api_url, overground_auth)
     )
     app.data_dict["overground_df"] = initial_overground
     # Set refresh interval from config (seconds)
